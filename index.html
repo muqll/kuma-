@@ -19,40 +19,54 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            padding: 20px;
+            padding: 10px;
+        }
+
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+            }
         }
 
         header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             border-bottom: 2px solid var(--card-bg);
             padding-bottom: 15px;
         }
 
         header h1 {
             color: #fff;
-            margin: 0 0 10px 0;
+            margin: 0 0 5px 0;
+            font-size: 1.6rem;
         }
 
-        .container {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        @media (max-width: 1024px) {
-            .container {
-                grid-template-columns: 1fr;
+        @media (min-width: 768px) {
+            header h1 {
+                font-size: 2.2rem;
             }
+        }
+
+        /* تحويل التنسيق العام إلى عمود واحد يترتب تلقائياً */
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
         }
 
         .panel {
             background-color: var(--card-bg);
             border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+            padding: 15px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        @media (min-width: 768px) {
+            .panel {
+                padding: 25px;
+            }
         }
 
         h2 {
@@ -60,7 +74,13 @@
             color: #fff;
             border-left: 4px solid var(--accent-color);
             padding-left: 10px;
-            font-size: 1.4rem;
+            font-size: 1.2rem;
+        }
+
+        @media (min-width: 768px) {
+            h2 {
+                font-size: 1.4rem;
+            }
         }
 
         .form-group {
@@ -71,7 +91,7 @@
             display: block;
             margin-bottom: 8px;
             color: var(--text-muted);
-            font-size: 0.95rem;
+            font-size: 0.9rem;
         }
 
         input, select, button {
@@ -83,6 +103,7 @@
             color: #fff;
             box-sizing: border-box;
             font-size: 1rem;
+            -webkit-appearance: none; /* تحسين مظهر القوائم على آيفون */
         }
 
         input:focus, select:focus {
@@ -106,19 +127,28 @@
         }
 
         .search-results {
-            margin-top: 20px;
-            padding: 15px;
+            margin-top: 15px;
+            padding: 12px;
             border-radius: 6px;
             background-color: rgba(11, 25, 44, 0.6);
             min-height: 50px;
+            font-size: 0.95rem;
         }
 
         .result-item {
-            padding: 10px;
+            padding: 10px 0;
             border-bottom: 1px solid #2E5A88;
             display: flex;
-            justify-content: space-between;
-            align-items: center;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        @media (min-width: 480px) {
+            .result-item {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
         }
 
         .result-item:last-child {
@@ -130,57 +160,61 @@
             color: #fff;
             padding: 4px 8px;
             border-radius: 4px;
-            font-size: 0.85rem;
+            font-size: 0.8rem;
+            text-align: center;
+            align-self: flex-start;
+        }
+
+        /* تحسين الخريطة لتصبح قابلة للتمرير الأفقي على الشاشات الصغيرة جداً دون أن يخرب التصميم */
+        .map-scroll-container {
+            width: 100%;
+            overflow-x: auto;
+            margin-top: 10px;
+            border: 1px solid #2E5A88;
+            border-radius: 8px;
         }
 
         .map-wrapper {
-            position: relative;
-            border: 2px dashed #2E5A88;
-            border-radius: 8px;
-            padding: 20px;
+            min-width: 700px; /* يضمن الحفاظ على هيكل الـ 8 رفوف بشكل مقروء ومنظم */
+            padding: 15px;
             background-color: rgba(11, 25, 44, 0.4);
         }
 
-        .compass-north {
+        .compass-north, .compass-south {
             text-align: center;
             font-weight: bold;
             color: var(--text-muted);
-            margin-bottom: 15px;
             letter-spacing: 2px;
+            font-size: 0.9rem;
         }
-
-        .compass-south {
-            text-align: center;
-            font-weight: bold;
-            color: var(--text-muted);
-            margin-top: 15px;
-            letter-spacing: 2px;
-        }
+        
+        .compass-north { margin-bottom: 15px; }
+        .compass-south { margin-top: 15px; }
 
         .warehouse-grid {
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
         }
 
         .row-container {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .row-label {
-            width: 30px;
+            width: 25px;
             font-weight: bold;
             text-align: center;
             color: var(--accent-color);
-            font-size: 1.2rem;
+            font-size: 1.1rem;
         }
 
         .shelves-container {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 6px;
+            gap: 5px;
             flex-grow: 1;
         }
 
@@ -190,8 +224,8 @@
             border-radius: 4px;
             padding: 4px;
             text-align: center;
-            font-size: 0.75rem;
-            transition: all 0.3s;
+            font-size: 0.7rem;
+            transition: all 0.2s;
             cursor: pointer;
         }
 
@@ -218,11 +252,12 @@
             color: #b2c8df;
         }
 
+        /* تأثيرات الإضاءة عند البحث */
         .highlight-shelf {
             background-color: #DF826C !important;
             border-color: #F4CE14 !important;
-            box-shadow: 0 0 12px #F4CE14;
-            transform: scale(1.03);
+            box-shadow: 0 0 10px #F4CE14;
+            transform: scale(1.02);
         }
 
         .highlight-slot {
@@ -235,10 +270,25 @@
             background-color: #153448;
             padding: 10px;
             border-radius: 6px;
-            margin-bottom: 15px;
-            font-size: 0.9rem;
+            margin-bottom: 10px;
+            font-size: 0.85rem;
             text-align: center;
             border: 1px solid var(--accent-color);
+            line-height: 1.4;
+        }
+
+        /* تحسين شبكة التحكم لتصبح مرنة على الهواتف */
+        .edit-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        @media (min-width: 480px) {
+            .edit-grid {
+                grid-template-columns: 1fr 1fr 1fr;
+            }
         }
     </style>
 </head>
@@ -246,66 +296,66 @@
 
     <header>
         <h1>Depo Konum Rehberi ve Raf Yönetim Sistemi</h1>
-        <p style="color: var(--text-muted); margin: 0;">Gerçek Zamanlı Coğrafi Konumlandırma (Koyu Mavi Tasarım)</p>
+        <p style="color: var(--text-muted); margin: 0; font-size: 0.9rem;">Mobil Uyumlu Canlı Takip Sistemi</p>
     </header>
 
     <div class="container">
         
-        <div style="display: flex; flex-direction: column; gap: 25px;">
-            <div class="panel">
-                <h2>🔍 Akıllı Konum Arama Motoru</h2>
-                <div class="form-group" style="margin-top: 15px;">
-                    <label for="searchBox">Aranacak kişinin veya malzemenin adını giriniz:</label>
-                    <input type="text" id="searchBox" placeholder="Örn: Hüseyin, Ahmet..." oninput="searchLocation()">
-                </div>
-                <div class="search-results" id="searchResults">
-                    <span style="color: var(--text-muted); font-style: italic;">Harita üzerindeki coğrafi konumu görmek için yukarıya bir isim yazın...</span>
-                </div>
+        <div class="panel">
+            <h2>🔍 Akıllı Konum Arama Motoru</h2>
+            <div class="form-group" style="margin-top: 15px;">
+                <label for="searchBox">Aranacak kişinin veya malzemenin adını giriniz:</label>
+                <input type="text" id="searchBox" placeholder="Örn: Hüseyin, Ahmet..." oninput="searchLocation()">
             </div>
-
-            <div class="panel">
-                <h2>⚙️ Raf Düzenleme ve Güncelleme Paneli</h2>
-                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Mevcut ismi yenisiyle değiştirmek için koordinatları seçin veya haritadan tıklayın.</p>
-                
-                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px;">
-                    <div class="form-group">
-                        <label for="editRow">Sıra (Koridor):</label>
-                        <select id="editRow"></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editShelf">Raf Numarası:</label>
-                        <select id="editShelf"></select>
-                    </div>
-                    <div class="form-group">
-                        <label for="editLevel">Kat / Bölüm:</label>
-                        <select id="editLevel">
-                            <option value="Üst">Üst (Top)</option>
-                            <option value="Orta">Orta (Middle)</option>
-                            <option value="Alt">Alt (Bottom)</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="newName">Yerleştirilecek Yeni İsim:</label>
-                    <input type="text" id="newName" placeholder="Yeni ismi buraya girin">
-                </div>
-
-                <button type="button" onclick="updateShelfData()">Rafı Güncelle ve Kaydet</button>
+            <div class="search-results" id="searchResults">
+                <span style="color: var(--text-muted); font-style: italic;">Haritada görmek için yukarıya bir isim yazın...</span>
             </div>
         </div>
 
         <div class="panel">
             <h2>🗺️ Canlı Depo Haritası (Kroki Görünümü)</h2>
             <div class="info-bar">
-                💡 Raflar yatay olarak 1'den 8'den sıralanır, sıralar ise dikey olarak Kuzey'den Güney'e doğru uzanır.
+                💡 Raflar yatay (1-8), sıralar dikey (Kuzey-Güney) uzanır. <br class="mobile-br">Mobil cihazlarda haritayı sağa/sola kaydırabilirsiniz.
             </div>
 
-            <div class="map-wrapper">
-                <div class="compass-north">▲ KUZEY (North)</div>
-                <div class="warehouse-grid" id="warehouseGrid"></div>
-                <div class="compass-south">▼ GÜNEY (South)</div>
+            <div class="map-scroll-container">
+                <div class="map-wrapper">
+                    <div class="compass-north">▲ KUZEY (North)</div>
+                    <div class="warehouse-grid" id="warehouseGrid"></div>
+                    <div class="compass-south">▼ GÜNEY (South)</div>
+                </div>
             </div>
+        </div>
+
+        <div class="panel">
+            <h2>⚙️ Raf Düzenleme ve Güncelleme Paneli</h2>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">İsmi değiştirmek için koordinatları seçin veya haritadan direkt rafa tıklayın.</p>
+            
+            <div class="edit-grid">
+                <div class="form-group">
+                    <label for="editRow">Sıra (Koridor):</label>
+                    <select id="editRow"></select>
+                </div>
+                <div class="form-group">
+                    <label for="editShelf">Raf Numarası:</label>
+                    <select id="editShelf"></select>
+                </div>
+                <div class="form-group">
+                    <label for="editLevel">Kat / Bölüm:</label>
+                    <select id="editLevel">
+                        <option value="Üst">Üst (Top)</option>
+                        <option value="Orta">Orta (Middle)</option>
+                        <option value="Alt">Alt (Bottom)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="newName">Yerleştirilecek Yeni İsim:</label>
+                <input type="text" id="newName" placeholder="Yeni ismi buraya girin">
+            </div>
+
+            <button type="button" onclick="updateShelfData()">Rafı Güncelle ve Kaydet</button>
         </div>
 
     </div>
@@ -318,8 +368,17 @@
         let warehouseData = {};
 
         function initData() {
-            // تم إجبار النظام هنا على مسح التخزين المؤقت القديم تلقائياً لتحميل الأسماء الجديدة فوراً
-            localStorage.removeItem('warehouse_storage_data');
+            // تنظيف الكاش عند أول تشغيل لضمان نزول الأسماء التجريبية
+            if (!localStorage.getItem('warehouse_initialized_v2')) {
+                localStorage.removeItem('warehouse_storage_data');
+                localStorage.setItem('warehouse_initialized_v2', 'true');
+            }
+
+            const savedData = localStorage.getItem('warehouse_storage_data');
+            if (savedData) {
+                warehouseData = JSON.parse(savedData);
+                return;
+            }
 
             turkishRows.forEach(row => {
                 warehouseData[row] = {};
@@ -328,7 +387,7 @@
                 }
             });
 
-            // تعبئة الأسماء التجريبية
+            // أسماء تجريبية مسبقة للتأكد من عمل النظام والبحث
             warehouseData['A'][1]['Orta'] = 'Hüseyin';
             warehouseData['A'][1]['Üst'] = 'Mehmet';
             warehouseData['A'][5]['Alt'] = 'Ahmet';
@@ -419,6 +478,9 @@
             document.getElementById('editRow').value = row;
             document.getElementById('editShelf').value = shelf;
             document.getElementById('newName').focus();
+            
+            // النزول التلقائي لقسم التعديل عند الضغط على رف في الخريطة تسهيلاً للمستخدم
+            document.getElementById('newName').scrollIntoView({ behavior: 'smooth' });
         }
 
         function searchLocation() {
@@ -429,7 +491,7 @@
             document.querySelectorAll('.level-slot').forEach(el => el.classList.remove('highlight-slot'));
 
             if (!query) {
-                resultsContainer.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">Harita üzerindeki coğrafi konumu görmek için yukarıya bir isim yazın...</span>';
+                resultsContainer.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">Haritada görmek için yukarıya bir isim yazın...</span>';
                 return;
             }
 
@@ -466,7 +528,7 @@
                     resultsContainer.appendChild(item);
                 });
             } else {
-                resultsContainer.innerHTML = '<span style="color: #DF826C;">⚠️ Bu isimde bir kayıt hiçbir rafta bulunamadı.</span>';
+                resultsContainer.innerHTML = '<span style="color: #DF826C;">⚠️ Kayıt bulunamadı.</span>';
             }
         }
 
@@ -478,7 +540,6 @@
 
             warehouseData[row][shelf][lvl] = name;
             
-            // عند تعديل أي اسم يتم تعطيل سطر المسح حتى تحفظ التعديلات الجديدة بشكل مستمر
             localStorage.setItem('warehouse_storage_data', JSON.stringify(warehouseData));
             
             renderInterface();
