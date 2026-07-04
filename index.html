@@ -38,7 +38,7 @@
         header h1 {
             color: #fff;
             margin: 0 0 5px 0;
-            font-size: 1.6rem;
+            font-size: 1.5rem;
         }
 
         @media (min-width: 768px) {
@@ -47,7 +47,7 @@
             }
         }
 
-        /* تحويل التنسيق العام إلى عمود واحد يترتب تلقائياً */
+        /* جعل جميع الأقسام تترتب تحت بعضها بشكل عمودي متناسق للهاتف */
         .container {
             display: flex;
             flex-direction: column;
@@ -103,7 +103,7 @@
             color: #fff;
             box-sizing: border-box;
             font-size: 1rem;
-            -webkit-appearance: none; /* تحسين مظهر القوائم على آيفون */
+            -webkit-appearance: none;
         }
 
         input:focus, select:focus {
@@ -165,7 +165,7 @@
             align-self: flex-start;
         }
 
-        /* تحسين الخريطة لتصبح قابلة للتمرير الأفقي على الشاشات الصغيرة جداً دون أن يخرب التصميم */
+        /* حاوية التمرير الأفقي للخريطة لحمايتها على الشاشات الصغيرة */
         .map-scroll-container {
             width: 100%;
             overflow-x: auto;
@@ -175,7 +175,7 @@
         }
 
         .map-wrapper {
-            min-width: 700px; /* يضمن الحفاظ على هيكل الـ 8 رفوف بشكل مقروء ومنظم */
+            min-width: 750px; /* تضمن بقاء الـ 8 رفوف واضحة ومنظمة دون تداخل */
             padding: 15px;
             background-color: rgba(11, 25, 44, 0.4);
         }
@@ -252,7 +252,6 @@
             color: #b2c8df;
         }
 
-        /* تأثيرات الإضاءة عند البحث */
         .highlight-shelf {
             background-color: #DF826C !important;
             border-color: #F4CE14 !important;
@@ -277,7 +276,6 @@
             line-height: 1.4;
         }
 
-        /* تحسين شبكة التحكم لتصبح مرنة على الهواتف */
         .edit-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -315,7 +313,7 @@
         <div class="panel">
             <h2>🗺️ Canlı Depo Haritası (Kroki Görünümü)</h2>
             <div class="info-bar">
-                💡 Raflar yatay (1-8), sıralar dikey (Kuzey-Güney) uzanır. <br class="mobile-br">Mobil cihazlarda haritayı sağa/sola kaydırabilirsiniz.
+                💡 Raflar yatay (1-8), sıralar dikey (Kuzey-Güney) uzanır. <br>Mobil cihazlarda haritayı parmağınızla sağa/sola kaydırabilirsiniz.
             </div>
 
             <div class="map-scroll-container">
@@ -329,7 +327,7 @@
 
         <div class="panel">
             <h2>⚙️ Raf Düzenleme ve Güncelleme Paneli</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">İsmi değiştirmek için koordinatları seçin veya haritadan direkt rafa tıklayın.</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Mevcut ismi değiştirmek için koordinatları seçin veya haritadan direkt ilgili rafa tıklayın.</p>
             
             <div class="edit-grid">
                 <div class="form-group">
@@ -368,10 +366,9 @@
         let warehouseData = {};
 
         function initData() {
-            // تنظيف الكاش عند أول تشغيل لضمان نزول الأسماء التجريبية
-            if (!localStorage.getItem('warehouse_initialized_v2')) {
+            if (!localStorage.getItem('warehouse_initialized_v3')) {
                 localStorage.removeItem('warehouse_storage_data');
-                localStorage.setItem('warehouse_initialized_v2', 'true');
+                localStorage.setItem('warehouse_initialized_v3', 'true');
             }
 
             const savedData = localStorage.getItem('warehouse_storage_data');
@@ -387,7 +384,7 @@
                 }
             });
 
-            // أسماء تجريبية مسبقة للتأكد من عمل النظام والبحث
+            // تعبئة تلقائية لبيانات تجريبية مسبقة للتأكد من عمل البحث
             warehouseData['A'][1]['Orta'] = 'Hüseyin';
             warehouseData['A'][1]['Üst'] = 'Mehmet';
             warehouseData['A'][5]['Alt'] = 'Ahmet';
@@ -479,7 +476,7 @@
             document.getElementById('editShelf').value = shelf;
             document.getElementById('newName').focus();
             
-            // النزول التلقائي لقسم التعديل عند الضغط على رف في الخريطة تسهيلاً للمستخدم
+            // النزول التلقائي السلس نحو قسم التعديل عند اختيار رف باللمس/الضغط
             document.getElementById('newName').scrollIntoView({ behavior: 'smooth' });
         }
 
