@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="tr" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akıllı Raf Konumlandırma ve Yönetim Sistemi</title>
+    <style>
+        :root {
+            --bg-color: #0B192C;
+            --card-bg: #1E3E62;
+            --accent-color: #008DDA;
+            --highlight-color: #41B06E;
+            --text-color: #E2F1E7;
+            --text-muted: #86B6F6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--card-bg);
+            padding-bottom: 15px;
+        }
+
+        header h1 {
+            color: #fff;
+            margin: 0 0 10px 0;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .panel {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        h2 {
+            margin-top: 0;
+            color: #fff;
+            border-left: 4px solid var(--accent-color);
+            padding-left: 10px;
+            font-size: 1.4rem;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #2E5A88;
+            border-radius: 6px;
+            background-color: var(--bg-color);
+            color: #fff;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--accent-color);
+            box-shadow: 0 0 8px rgba(0, 141, 218, 0.5);
+        }
+
+        button {
+            background-color: var(--accent-color);
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+            margin-top: 10px;
+            color: #fff;
+        }
+
+        button:hover {
+            background-color: #41B06E;
+        }
+
+        .search-results {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 6px;
+            background-color: rgba(11, 25, 44, 0.6);
+            min-height: 50px;
+        }
+
+        .result-item {
+            padding: 10px;
+            border-bottom: 1px solid #2E5A88;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .result-item:last-child {
+            border-bottom: none;
+        }
+
+        .badge {
+            background-color: var(--highlight-color);
+            color: #fff;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85rem;
+        }
+
+        .map-wrapper {
+            position: relative;
+            border: 2px dashed #2E5A88;
+            border-radius: 8px;
+            padding: 20px;
+            background-color: rgba(11, 25, 44, 0.4);
+        }
+
+        .compass-north {
+            text-align: center;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-bottom: 15px;
+            letter-spacing: 2px;
+        }
+
+        .compass-south {
+            text-align: center;
+            font-weight: bold;
+            color: var(--text-muted);
+            margin-top: 15px;
+            letter-spacing: 2px;
+        }
+
+        .warehouse-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .row-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .row-label {
+            width: 30px;
+            font-weight: bold;
+            text-align: center;
+            color: var(--accent-color);
+            font-size: 1.2rem;
+        }
+
+        .shelves-container {
+            display: grid;
+            grid-template-columns: repeat(8, 1fr);
+            gap: 6px;
+            flex-grow: 1;
+        }
+
+        .shelf-block {
+            background-color: #153448;
+            border: 1px solid #3C5B6F;
+            border-radius: 4px;
+            padding: 4px;
+            text-align: center;
+            font-size: 0.75rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .shelf-title {
+            font-weight: bold;
+            border-bottom: 1px solid #3C5B6F;
+            margin-bottom: 3px;
+            color: #fff;
+        }
+
+        .levels {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .level-slot {
+            padding: 2px 0;
+            background-color: rgba(11, 25, 44, 0.5);
+            border-radius: 2px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            color: #b2c8df;
+        }
+
+        .highlight-shelf {
+            background-color: #DF826C !important;
+            border-color: #F4CE14 !important;
+            box-shadow: 0 0 12px #F4CE14;
+            transform: scale(1.03);
+        }
+
+        .highlight-slot {
+            background-color: #F4CE14 !important;
+            color: #000 !important;
+            font-weight: bold;
+        }
+
+        .info-bar {
+            background-color: #153448;
+            padding: 10px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+            text-align: center;
+            border: 1px solid var(--accent-color);
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Depo Konum Rehberi ve Raf Yönetim Sistemi</h1>
+        <p style="color: var(--text-muted); margin: 0;">Gerçek Zamanlı Coğrafi Konumlandırma (Koyu Mavi Tasarım)</p>
+    </header>
+
+    <div class="container">
+        
+        <div style="display: flex; flex-direction: column; gap: 25px;">
+            <div class="panel">
+                <h2>🔍 Akıllı Konum Arama Motoru</h2>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label for="searchBox">Aranacak kişinin veya malzemenin adını giriniz:</label>
+                    <input type="text" id="searchBox" placeholder="Örn: Hüseyin, Ahmet..." oninput="searchLocation()">
+                </div>
+                <div class="search-results" id="searchResults">
+                    <span style="color: var(--text-muted); font-style: italic;">Harita üzerindeki coğrafi konumu görmek için yukarıya bir isim yazın...</span>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>⚙️ Raf Düzenleme ve Güncelleme Paneli</h2>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Mevcut ismi yenisiyle değiştirmek için koordinatları seçin veya haritadan tıklayın.</p>
+                
+                <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px;">
+                    <div class="form-group">
+                        <label for="editRow">Sıra (Koridor):</label>
+                        <select id="editRow"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editShelf">Raf Numarası:</label>
+                        <select id="editShelf"></select>
+                    </div>
+                    <div class="form-group">
+                        <label for="editLevel">Kat / Bölüm:</label>
+                        <select id="editLevel">
+                            <option value="Üst">Üst (Top)</option>
+                            <option value="Orta">Orta (Middle)</option>
+                            <option value="Alt">Alt (Bottom)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="newName">Yerleştirilecek Yeni İsim:</label>
+                    <input type="text" id="newName" placeholder="Yeni ismi buraya girin">
+                </div>
+
+                <button type="button" onclick="updateShelfData()">Rafı Güncelle ve Kaydet</button>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>🗺️ Canlı Depo Haritası (Kroki Görünümü)</h2>
+            <div class="info-bar">
+                💡 Raflar yatay olarak 1'den 8'den sıralanır, sıralar ise dikey olarak Kuzey'den Güney'e doğru uzanır.
+            </div>
+
+            <div class="map-wrapper">
+                <div class="compass-north">▲ KUZEY (North)</div>
+                <div class="warehouse-grid" id="warehouseGrid"></div>
+                <div class="compass-south">▼ GÜNEY (South)</div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        const turkishRows = ['A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'Ğ', 'H'];
+        const totalShelves = 8;
+        const levels = ['Üst', 'Orta', 'Alt'];
+
+        let warehouseData = {};
+
+        function initData() {
+            // تم إجبار النظام هنا على مسح التخزين المؤقت القديم تلقائياً لتحميل الأسماء الجديدة فوراً
+            localStorage.removeItem('warehouse_storage_data');
+
+            turkishRows.forEach(row => {
+                warehouseData[row] = {};
+                for (let s = 1; s <= totalShelves; s++) {
+                    warehouseData[row][s] = { 'Üst': '', 'Orta': '', 'Alt': '' };
+                }
+            });
+
+            // تعبئة الأسماء التجريبية
+            warehouseData['A'][1]['Orta'] = 'Hüseyin';
+            warehouseData['A'][1]['Üst'] = 'Mehmet';
+            warehouseData['A'][5]['Alt'] = 'Ahmet';
+            warehouseData['B'][3]['Orta'] = 'Zeynep';
+            warehouseData['C'][8]['Üst'] = 'Ali';
+            warehouseData['Ç'][2]['Alt'] = 'Ayşe';
+            warehouseData['D'][4]['Orta'] = 'Fatma';
+            warehouseData['F'][6]['Üst'] = 'Mustafa';
+            warehouseData['H'][8]['Alt'] = 'Emre';
+            
+            saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('warehouse_storage_data', JSON.stringify(warehouseData));
+        }
+
+        function renderInterface() {
+            const gridContainer = document.getElementById('warehouseGrid');
+            const editRowSelect = document.getElementById('editRow');
+            const editShelfSelect = document.getElementById('editShelf');
+
+            gridContainer.innerHTML = '';
+            editRowSelect.innerHTML = '';
+            editShelfSelect.innerHTML = '';
+
+            turkishRows.forEach(row => {
+                let opt = document.createElement('option');
+                opt.value = row;
+                opt.textContent = `${row} Sırası`;
+                editRowSelect.appendChild(opt);
+            });
+
+            for (let s = 1; s <= totalShelves; s++) {
+                let opt = document.createElement('option');
+                opt.value = s;
+                opt.textContent = `${s}. Raf`;
+                editShelfSelect.appendChild(opt);
+            }
+
+            turkishRows.forEach(row => {
+                const rowDiv = document.createElement('div');
+                rowDiv.className = 'row-container';
+
+                const label = document.createElement('div');
+                label.className = 'row-label';
+                label.textContent = row;
+                rowDiv.appendChild(label);
+
+                const shelvesDiv = document.createElement('div');
+                shelvesDiv.className = 'shelves-container';
+
+                for (let s = 1; s <= totalShelves; s++) {
+                    const shelfBlock = document.createElement('div');
+                    shelfBlock.className = 'shelf-block';
+                    shelfBlock.id = `shelf-${row}-${s}`;
+                    shelfBlock.setAttribute('onclick', `fillEditor('${row}', ${s})`);
+
+                    const title = document.createElement('div');
+                    title.className = 'shelf-title';
+                    title.textContent = `${s}`;
+                    shelfBlock.appendChild(title);
+
+                    const levelsDiv = document.createElement('div');
+                    levelsDiv.className = 'levels';
+
+                    levels.forEach(lvl => {
+                        const lvlSlot = document.createElement('div');
+                        lvlSlot.className = 'level-slot';
+                        lvlSlot.id = `slot-${row}-${s}-${lvl}`;
+                        
+                        const name = warehouseData[row][s][lvl] || '---';
+                        lvlSlot.textContent = name;
+                        lvlSlot.title = `${lvl}: ${name}`;
+                        levelsDiv.appendChild(lvlSlot);
+                    });
+
+                    shelfBlock.appendChild(levelsDiv);
+                    shelvesDiv.appendChild(shelfBlock);
+                }
+
+                rowDiv.appendChild(shelvesDiv);
+                gridContainer.appendChild(rowDiv);
+            });
+        }
+
+        function fillEditor(row, shelf) {
+            document.getElementById('editRow').value = row;
+            document.getElementById('editShelf').value = shelf;
+            document.getElementById('newName').focus();
+        }
+
+        function searchLocation() {
+            const query = document.getElementById('searchBox').value.trim();
+            const resultsContainer = document.getElementById('searchResults');
+            
+            document.querySelectorAll('.shelf-block').forEach(el => el.classList.remove('highlight-shelf'));
+            document.querySelectorAll('.level-slot').forEach(el => el.classList.remove('highlight-slot'));
+
+            if (!query) {
+                resultsContainer.innerHTML = '<span style="color: var(--text-muted); font-style: italic;">Harita üzerindeki coğrafi konumu görmek için yukarıya bir isim yazın...</span>';
+                return;
+            }
+
+            let matches = [];
+
+            turkishRows.forEach(row => {
+                for (let s = 1; s <= totalShelves; s++) {
+                    levels.forEach(lvl => {
+                        const name = warehouseData[row][s][lvl];
+                        if (name && name.toLowerCase().includes(query.toLowerCase())) {
+                            matches.push({ row, shelf: s, level: lvl, name });
+                            
+                            document.getElementById(`shelf-${row}-${s}`).classList.add('highlight-shelf');
+                            document.getElementById(`slot-${row}-${s}-${lvl}`).classList.add('highlight-slot');
+                        }
+                    });
+                }
+            });
+
+            if (matches.length > 0) {
+                resultsContainer.innerHTML = '';
+                matches.forEach(match => {
+                    const item = document.createElement('div');
+                    item.className = 'result-item';
+                    item.innerHTML = `
+                        <div>
+                            <strong>${match.name}</strong> bulundu: 
+                            <span style="color: #F4CE14;">Sıra ${match.row}</span>, 
+                            <span style="color: #F4CE14;">Raf ${match.shelf}</span>, 
+                            <span>Kat (${match.level})</span>
+                        </div>
+                        <span class="badge">Haritada İşaretlendi 📍</span>
+                    `;
+                    resultsContainer.appendChild(item);
+                });
+            } else {
+                resultsContainer.innerHTML = '<span style="color: #DF826C;">⚠️ Bu isimde bir kayıt hiçbir rafta bulunamadı.</span>';
+            }
+        }
+
+        function updateShelfData() {
+            const row = document.getElementById('editRow').value;
+            const shelf = document.getElementById('editShelf').value;
+            const lvl = document.getElementById('editLevel').value;
+            const name = document.getElementById('newName').value.trim();
+
+            warehouseData[row][shelf][lvl] = name;
+            
+            // عند تعديل أي اسم يتم تعطيل سطر المسح حتى تحفظ التعديلات الجديدة بشكل مستمر
+            localStorage.setItem('warehouse_storage_data', JSON.stringify(warehouseData));
+            
+            renderInterface();
+            searchLocation();
+            
+            document.getElementById('newName').value = '';
+            alert(`Konum başarıyla güncellendi: Sıra ${row} -> Raf ${shelf} -> Kat ${lvl}`);
+        }
+
+        window.onload = function() {
+            initData();
+            renderInterface();
+        };
+    </script>
+</body>
+</html>
