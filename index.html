@@ -23,9 +23,7 @@
         }
 
         @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
+            body { padding: 20px; }
         }
 
         header {
@@ -64,9 +62,7 @@
             font-size: 1.2rem;
         }
 
-        .form-group {
-            margin-bottom: 15px;
-        }
+        .form-group { margin-bottom: 15px; }
 
         label {
             display: block;
@@ -96,9 +92,7 @@
             color: #fff;
         }
 
-        button:hover {
-            background-color: #41B06E;
-        }
+        button:hover { background-color: #41B06E; }
 
         .search-results {
             margin-top: 15px;
@@ -256,9 +250,7 @@
         }
 
         @media (min-width: 480px) {
-            .edit-grid {
-                grid-template-columns: 1fr 1fr 1fr;
-            }
+            .edit-grid { grid-template-columns: 1fr 1fr 1fr; }
         }
 
         .loading-text {
@@ -343,9 +335,7 @@
     </div>
 
     <script>
-        // الرابط المباشر لقاعدة البيانات الخاصة بك
         const FIREBASE_DB_URL = "https://kumas-c7cb4-default-rtdb.firebaseio.com";
-
         const turkishRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         const totalShelves = 8;
         const levels = ['Üst', 'Orta', 'Alt'];
@@ -353,35 +343,38 @@
         let warehouseData = {};
 
         function initFirebaseConnection() {
-            // الاستماع الفوري للتحديثات السحابية
-            const eventSource = new EventSource(`${FIREBASE_DB_URL}/warehouse.json`);
+            // توحيد الرابط لقراءة الجذر بالكامل لضمان استقرار الاتصال الحي 100%
+            const eventSource = new EventSource(`${FIREBASE_DB_URL}/.json`);
             
             eventSource.onmessage = function(event) {
                 const response = JSON.parse(event.data);
                 
-                // التحقق من مكان تخزين البيانات الفعلي لعدم حدوث تعليق في الواجهة
-                if (response && response.data) {
-                    if (response.data.data) {
-                        warehouseData = response.data.data;
-                    } else {
+                // معالجة ذكية لشكل البيانات لمنع حدوث أي تعليق في واجهة العمال
+                if (response) {
+                    if (response.warehouse && response.warehouse.data) {
+                        warehouseData = response.warehouse.data;
+                    } else if (response.data) {
                         warehouseData = response.data;
+                    } else {
+                        warehouseData = response;
                     }
+                    
+                    fillMissingStructure();
                     renderInterface();
                     searchLocation(); 
                 } else {
-                    createInitialStructure();
+                    fillMissingStructure();
                 }
             };
 
             eventSource.onerror = function() {
-                // وضع حماية عند انقطاع الخادم المؤقت لضمان عمل الواجهة
                 if(Object.keys(warehouseData).length === 0) {
-                    createInitialStructure();
+                    fillMissingStructure();
                 }
             };
         }
 
-        function createInitialStructure() {
+        function fillMissingStructure() {
             turkishRows.forEach(row => {
                 if (!warehouseData[row]) warehouseData[row] = {};
                 for (let s = 1; s <= totalShelves; s++) {
@@ -491,7 +484,6 @@
                             const name = warehouseData[row][s][lvl];
                             if (name && name !== '---' && name.toLowerCase().includes(query.toLowerCase())) {
                                 matches.push({ row, shelf: s, level: lvl, name });
-                                
                                 document.getElementById(`shelf-${row}-${s}`).classList.add('highlight-shelf');
                                 document.getElementById(`slot-${row}-${s}-${lvl}`).classList.add('highlight-slot');
                             }
@@ -527,22 +519,20 @@
             const lvl = document.getElementById('editLevel').value;
             const name = document.getElementById('newName').value.trim() || '---';
 
-            if (!warehouseData[row]) warehouseData[row] = {};
-            if (!warehouseData[row][shelf]) warehouseData[row][shelf] = { 'Üst': '---', 'Orta': '---', 'Alt': '---' };
-            
-            warehouseData[row][shelf][lvl] = name;
-
-            // حفظ التحديث مباشرة في الجذر الرئيسي لتفادي مشاكل الحجب والتعليق
-            fetch(`${FIREBASE_DB_URL}/warehouse/data/${row}/${shelf}.json`, {
+            // ربط الحفظ المباشر بمسار موحد تماماً لمنع حدوث أي انفصال في المستقبل
+            fetch(`${FIREBASE_DB_URL}/data/${row}/${shelf}.json`, {
                 method: 'PATCH',
                 body: JSON.stringify({ [lvl]: name })
             })
             .then(() => {
                 document.getElementById('newName').value = '';
+                if(!warehouseData[row]) warehouseData[row] = {};
+                if(!warehouseData[row][shelf]) warehouseData[row][shelf] = {};
+                warehouseData[row][shelf][lvl] = name;
                 renderInterface();
             })
             .catch(err => {
-                alert("Hata: " + err);
+                alert("Bağlantı Hatası: " + err);
             });
         }
 
