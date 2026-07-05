@@ -140,7 +140,7 @@
             border-radius: 8px;
         }
 
-        /* تنسيق توزيع الخريطة ليطابق كروكي الرسمة (شمال يمين - جنوب يسار) */
+        /* محاكاة الهيكل الجغرافي الدقيق للرسمة المرفقة */
         .map-horizontal-layout {
             min-width: 950px;
             padding: 15px;
@@ -384,9 +384,7 @@
                 }
             });
 
-            initialData['A'][1]['Orta'] = 'Fevzi';
-            initialData['A'][1]['Üst'] = 'Fevzi';
-            initialData['A'][1]['Alt'] = 'Fevzi';
+            initialData['A'][1]['Orta'] = 'Deneme';
 
             fetch(`${FIREBASE_DB_URL}/warehouse.json`, {
                 method: 'PUT',
