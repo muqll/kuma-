@@ -62,24 +62,12 @@
             box-shadow: 0 6px 20px rgba(0,0,0,0.3);
         }
 
-        @media (min-width: 768px) {
-            .panel {
-                padding: 25px;
-            }
-        }
-
         h2 {
             margin-top: 0;
             color: #fff;
             border-left: 4px solid var(--accent-color);
             padding-left: 10px;
             font-size: 1.2rem;
-        }
-
-        @media (min-width: 768px) {
-            h2 {
-                font-size: 1.4rem;
-            }
         }
 
         .form-group {
@@ -102,13 +90,6 @@
             color: #fff;
             box-sizing: border-box;
             font-size: 1rem;
-            -webkit-appearance: none;
-        }
-
-        input:focus, select:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 8px rgba(0, 141, 218, 0.5);
         }
 
         button {
@@ -131,7 +112,6 @@
             border-radius: 6px;
             background-color: rgba(11, 25, 44, 0.6);
             min-height: 50px;
-            font-size: 0.95rem;
         }
 
         .result-item {
@@ -150,18 +130,12 @@
             }
         }
 
-        .result-item:last-child {
-            border-bottom: none;
-        }
-
         .badge {
             background-color: var(--highlight-color);
             color: #fff;
             padding: 4px 8px;
             border-radius: 4px;
             font-size: 0.8rem;
-            text-align: center;
-            align-self: flex-start;
         }
 
         .map-scroll-container {
@@ -172,57 +146,64 @@
             border-radius: 8px;
         }
 
-        .map-wrapper {
-            min-width: 750px;
+        /* تعديل توزيع الخريطة لتصبح أفقية بالكامل (الشرق والغرب) تماشياً مع اتجاه الشمال والجنوب الجانبي */
+        .map-horizontal-layout {
+            min-width: 900px;
             padding: 15px;
             background-color: rgba(11, 25, 44, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
         }
 
-        .compass-north, .compass-south {
-            text-align: center;
+        .compass-side {
             font-weight: bold;
             color: var(--text-muted);
             letter-spacing: 2px;
-            font-size: 0.9rem;
+            font-size: 1rem;
+            text-align: center;
+            white-space: nowrap;
+            padding: 10px;
+            background: rgba(30, 62, 98, 0.5);
+            border-radius: 6px;
         }
-        
-        .compass-north { margin-bottom: 15px; }
-        .compass-south { margin-top: 15px; }
 
         .warehouse-grid {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 15px;
+            flex-grow: 1;
         }
 
         .row-container {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
         }
 
         .row-label {
-            width: 25px;
+            width: 30px;
             font-weight: bold;
             text-align: center;
             color: var(--accent-color);
-            font-size: 1.1rem;
+            font-size: 1.3rem;
         }
 
         .shelves-container {
             display: grid;
             grid-template-columns: repeat(8, 1fr);
-            gap: 5px;
+            gap: 8px;
             flex-grow: 1;
         }
 
         .shelf-block {
             background-color: #153448;
             border: 1px solid #3C5B6F;
-            border-radius: 4px;
-            padding: 4px;
+            border-radius: 6px;
+            padding: 6px;
             text-align: center;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             transition: all 0.2s;
             cursor: pointer;
         }
@@ -230,20 +211,21 @@
         .shelf-title {
             font-weight: bold;
             border-bottom: 1px solid #3C5B6F;
-            margin-bottom: 3px;
+            margin-bottom: 4px;
             color: #fff;
+            font-size: 0.85rem;
         }
 
         .levels {
             display: flex;
             flex-direction: column;
-            gap: 2px;
+            gap: 3px;
         }
 
         .level-slot {
-            padding: 2px 0;
+            padding: 3px 0;
             background-color: rgba(11, 25, 44, 0.5);
-            border-radius: 2px;
+            border-radius: 3px;
             overflow: hidden;
             text-overflow: ellipsis;
             white-space: nowrap;
@@ -253,8 +235,8 @@
         .highlight-shelf {
             background-color: #DF826C !important;
             border-color: #F4CE14 !important;
-            box-shadow: 0 0 10px #F4CE14;
-            transform: scale(1.02);
+            box-shadow: 0 0 12px #F4CE14;
+            transform: scale(1.03);
         }
 
         .highlight-slot {
@@ -265,13 +247,12 @@
 
         .info-bar {
             background-color: #153448;
-            padding: 10px;
+            padding: 12px;
             border-radius: 6px;
             margin-bottom: 10px;
             font-size: 0.85rem;
             text-align: center;
             border: 1px solid var(--accent-color);
-            line-height: 1.4;
         }
 
         .edit-grid {
@@ -293,6 +274,7 @@
             font-weight: bold;
             font-size: 1.1rem;
             padding: 20px 0;
+            width: 100%;
         }
     </style>
 </head>
@@ -319,23 +301,25 @@
         <div class="panel">
             <h2>🗺️ Canlı Depo Haritası (Kroki Görünümü)</h2>
             <div class="info-bar">
-                💡 Raflar yatay (1-8), sıralar dikey (Kuzey-Güney) uzanır. <br>Değişiklikler tüm kullanıcılarda anlık olarak güncellenir.
+                💡 Sıralar (A-H) dikey, Raflar (1-8) yatay olarak yerleştirilmiştir. Sağ taraf Kuzey'i, sol taraf Güney'i (Giriş Kapısı) gösterir.
             </div>
 
             <div class="map-scroll-container">
-                <div class="map-wrapper">
-                    <div class="compass-north">▲ KUZEY (North)</div>
+                <div class="map-horizontal-layout">
+                    <div class="compass-side">◀ GÜNEY<br>(South / Kapı)</div>
+                    
                     <div class="warehouse-grid" id="warehouseGrid">
                         <div class="loading-text">Veriler bulut sunucusundan yükleniyor...</div>
                     </div>
-                    <div class="compass-south">▼ GÜNEY (South)</div>
+                    
+                    <div class="compass-side">KUZEY ▶<br>(North)</div>
                 </div>
             </div>
         </div>
 
         <div class="panel">
             <h2>⚙️ Raf Düzenleme ve Güncelleme Paneli</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Mevcut ismi değiştirmek için koordinatları seçin veya haritadan direkt ilgili rafa tıklayın.</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Değişiklik yapmak için rafa tıklayabilir veya aşağıdaki menüyü kullanabilirsiniz.</p>
             
             <div class="edit-grid">
                 <div class="form-group">
@@ -367,7 +351,6 @@
     </div>
 
     <script>
-        // رابط قاعدة البيانات السحابية الخاص بمشروعك الحالي:
         const FIREBASE_DB_URL = "https://kumas-c7cb4-default-rtdb.firebaseio.com";
 
         const turkishRows = ['A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'Ğ', 'H'];
@@ -383,7 +366,6 @@
                 return;
             }
 
-            // إنشاء اتصال حي ومباشر مع سيرفر Firebase
             const eventSource = new EventSource(`${FIREBASE_DB_URL}/warehouse.json`);
             
             eventSource.onmessage = function(event) {
@@ -413,10 +395,6 @@
             initialData['A'][5]['Alt'] = 'Ahmet';
             initialData['B'][3]['Orta'] = 'Zeynep';
             initialData['C'][8]['Üst'] = 'Ali';
-            initialData['Ç'][2]['Alt'] = 'Ayşe';
-            initialData['D'][4]['Orta'] = 'Fatma';
-            initialData['F'][6]['Üst'] = 'Mustafa';
-            initialData['H'][8]['Alt'] = 'Emre';
 
             fetch(`${FIREBASE_DB_URL}/warehouse.json`, {
                 method: 'PUT',
