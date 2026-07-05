@@ -140,7 +140,6 @@
             border-radius: 8px;
         }
 
-        /* محاكاة الهيكل الجغرافي الدقيق للرسمة المرفقة */
         .map-horizontal-layout {
             min-width: 950px;
             padding: 15px;
@@ -313,7 +312,6 @@
 
         <div class="panel">
             <h2>⚙️ Raf Düzenleme ve Güncelleme Paneli</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Mevcut ismi değiştirmek için raf hücresine tıklayabilir veya menüyü kullanabilirsiniz.</p>
             
             <div class="edit-grid">
                 <div class="form-group">
@@ -327,9 +325,9 @@
                 <div class="form-group">
                     <label for="editLevel">Kat / Bölüm:</label>
                     <select id="editLevel">
-                        <option value="Üst">Üst (Top)</option>
-                        <option value="Orta">Orta (Middle)</option>
-                        <option value="Alt">Alt (Bottom)</option>
+                        <option value="Üst">Üst</option>
+                        <option value="Orta">Orta</option>
+                        <option value="Alt">Alt</option>
                     </select>
                 </div>
             </div>
@@ -345,6 +343,7 @@
     </div>
 
     <script>
+        // الرابط المباشر لقاعدة البيانات الخاصة بك
         const FIREBASE_DB_URL = "https://kumas-c7cb4-default-rtdb.firebaseio.com";
 
         const turkishRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
@@ -354,42 +353,44 @@
         let warehouseData = {};
 
         function initFirebaseConnection() {
-            if (!FIREBASE_DB_URL || FIREBASE_DB_URL.includes("YOUR_FIREBASE")) {
-                const gridContainer = document.getElementById('warehouseGrid');
-                gridContainer.innerHTML = '<div class="loading-text" style="color: #DF826C;">⚠️ Lütfen geçerli bir Firebase URL adresi ekleyin!</div>';
-                return;
-            }
-
+            // الاستماع الفوري للتحديثات السحابية
             const eventSource = new EventSource(`${FIREBASE_DB_URL}/warehouse.json`);
             
             eventSource.onmessage = function(event) {
-                const data = JSON.parse(event.data);
+                const response = JSON.parse(event.data);
                 
-                if (!data || !data.data) {
-                    createInitialStructure();
-                } else {
-                    warehouseData = data.data;
+                // التحقق من مكان تخزين البيانات الفعلي لعدم حدوث تعليق في الواجهة
+                if (response && response.data) {
+                    if (response.data.data) {
+                        warehouseData = response.data.data;
+                    } else {
+                        warehouseData = response.data;
+                    }
                     renderInterface();
                     searchLocation(); 
+                } else {
+                    createInitialStructure();
+                }
+            };
+
+            eventSource.onerror = function() {
+                // وضع حماية عند انقطاع الخادم المؤقت لضمان عمل الواجهة
+                if(Object.keys(warehouseData).length === 0) {
+                    createInitialStructure();
                 }
             };
         }
 
         function createInitialStructure() {
-            let initialData = {};
             turkishRows.forEach(row => {
-                initialData[row] = {};
+                if (!warehouseData[row]) warehouseData[row] = {};
                 for (let s = 1; s <= totalShelves; s++) {
-                    initialData[row][s] = { 'Üst': '', 'Orta': '', 'Alt': '' };
+                    if (!warehouseData[row][s]) {
+                        warehouseData[row][s] = { 'Üst': '---', 'Orta': '---', 'Alt': '---' };
+                    }
                 }
             });
-
-            initialData['A'][1]['Orta'] = 'Deneme';
-
-            fetch(`${FIREBASE_DB_URL}/warehouse.json`, {
-                method: 'PUT',
-                body: JSON.stringify({ data: initialData })
-            });
+            renderInterface();
         }
 
         function renderInterface() {
@@ -446,9 +447,11 @@
                         lvlSlot.className = 'level-slot';
                         lvlSlot.id = `slot-${row}-${s}-${lvl}`;
                         
-                        const name = (warehouseData[row] && warehouseData[row][s]) ? (warehouseData[row][s][lvl] || '---') : '---';
+                        let name = '---';
+                        if (warehouseData[row] && warehouseData[row][s] && warehouseData[row][s][lvl]) {
+                            name = warehouseData[row][s][lvl];
+                        }
                         lvlSlot.textContent = name;
-                        lvlSlot.title = `${lvl}: ${name}`;
                         levelsDiv.appendChild(lvlSlot);
                     });
 
@@ -465,7 +468,6 @@
             document.getElementById('editRow').value = row;
             document.getElementById('editShelf').value = shelf;
             document.getElementById('newName').focus();
-            document.getElementById('newName').scrollIntoView({ behavior: 'smooth' });
         }
 
         function searchLocation() {
@@ -487,7 +489,7 @@
                     levels.forEach(lvl => {
                         if (warehouseData[row] && warehouseData[row][s]) {
                             const name = warehouseData[row][s][lvl];
-                            if (name && name.toLowerCase().includes(query.toLowerCase())) {
+                            if (name && name !== '---' && name.toLowerCase().includes(query.toLowerCase())) {
                                 matches.push({ row, shelf: s, level: lvl, name });
                                 
                                 document.getElementById(`shelf-${row}-${s}`).classList.add('highlight-shelf');
@@ -523,22 +525,24 @@
             const row = document.getElementById('editRow').value;
             const shelf = document.getElementById('editShelf').value;
             const lvl = document.getElementById('editLevel').value;
-            const name = document.getElementById('newName').value.trim();
+            const name = document.getElementById('newName').value.trim() || '---';
 
             if (!warehouseData[row]) warehouseData[row] = {};
-            if (!warehouseData[row][shelf]) warehouseData[row][shelf] = { 'Üst': '', 'Orta': '', 'Alt': '' };
+            if (!warehouseData[row][shelf]) warehouseData[row][shelf] = { 'Üst': '---', 'Orta': '---', 'Alt': '---' };
             
             warehouseData[row][shelf][lvl] = name;
 
+            // حفظ التحديث مباشرة في الجذر الرئيسي لتفادي مشاكل الحجب والتعليق
             fetch(`${FIREBASE_DB_URL}/warehouse/data/${row}/${shelf}.json`, {
                 method: 'PATCH',
                 body: JSON.stringify({ [lvl]: name })
             })
             .then(() => {
                 document.getElementById('newName').value = '';
+                renderInterface();
             })
             .catch(err => {
-                alert("Veri kaydedilirken hata oluştu: " + err);
+                alert("Hata: " + err);
             });
         }
 
