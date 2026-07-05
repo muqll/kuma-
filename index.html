@@ -41,12 +41,6 @@
             font-size: 1.5rem;
         }
 
-        @media (min-width: 768px) {
-            header h1 {
-                font-size: 2.2rem;
-            }
-        }
-
         .container {
             display: flex;
             flex-direction: column;
@@ -146,9 +140,9 @@
             border-radius: 8px;
         }
 
-        /* تعديل توزيع الخريطة لتصبح أفقية بالكامل (الشرق والغرب) تماشياً مع اتجاه الشمال والجنوب الجانبي */
+        /* تنسيق توزيع الخريطة ليطابق كروكي الرسمة (شمال يمين - جنوب يسار) */
         .map-horizontal-layout {
-            min-width: 900px;
+            min-width: 950px;
             padding: 15px;
             background-color: rgba(11, 25, 44, 0.4);
             display: flex;
@@ -164,7 +158,7 @@
             font-size: 1rem;
             text-align: center;
             white-space: nowrap;
-            padding: 10px;
+            padding: 12px;
             background: rgba(30, 62, 98, 0.5);
             border-radius: 6px;
         }
@@ -301,25 +295,25 @@
         <div class="panel">
             <h2>🗺️ Canlı Depo Haritası (Kroki Görünümü)</h2>
             <div class="info-bar">
-                💡 Sıralar (A-H) dikey, Raflar (1-8) yatay olarak yerleştirilmiştir. Sağ taraf Kuzey'i, sol taraf Güney'i (Giriş Kapısı) gösterir.
+                💡 Sıralar (A-H) yukarıdan aşağıya, raflar (1-8) soldan sağa yerleştirilmiştir. Sol taraf Güney (Giriş Kapısı), sağ taraf Kuzey yönüdür.
             </div>
 
             <div class="map-scroll-container">
                 <div class="map-horizontal-layout">
-                    <div class="compass-side">◀ GÜNEY<br>(South / Kapı)</div>
+                    <div class="compass-side">◀ GÜNEY<br>(Kapı)</div>
                     
                     <div class="warehouse-grid" id="warehouseGrid">
                         <div class="loading-text">Veriler bulut sunucusundan yükleniyor...</div>
                     </div>
                     
-                    <div class="compass-side">KUZEY ▶<br>(North)</div>
+                    <div class="compass-side">KUZEY ▶</div>
                 </div>
             </div>
         </div>
 
         <div class="panel">
             <h2>⚙️ Raf Düzenleme ve Güncelleme Paneli</h2>
-            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Değişiklik yapmak için rafa tıklayabilir veya aşağıdaki menüyü kullanabilirsiniz.</p>
+            <p style="color: var(--text-muted); font-size: 0.85rem; margin-top: 5px;">Mevcut ismi değiştirmek için raf hücresine tıklayabilir veya menüyü kullanabilirsiniz.</p>
             
             <div class="edit-grid">
                 <div class="form-group">
@@ -353,7 +347,7 @@
     <script>
         const FIREBASE_DB_URL = "https://kumas-c7cb4-default-rtdb.firebaseio.com";
 
-        const turkishRows = ['A', 'B', 'C', 'Ç', 'D', 'E', 'F', 'G', 'Ğ', 'H'];
+        const turkishRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
         const totalShelves = 8;
         const levels = ['Üst', 'Orta', 'Alt'];
 
@@ -390,11 +384,9 @@
                 }
             });
 
-            initialData['A'][1]['Orta'] = 'Hüseyin';
-            initialData['A'][1]['Üst'] = 'Mehmet';
-            initialData['A'][5]['Alt'] = 'Ahmet';
-            initialData['B'][3]['Orta'] = 'Zeynep';
-            initialData['C'][8]['Üst'] = 'Ali';
+            initialData['A'][1]['Orta'] = 'Fevzi';
+            initialData['A'][1]['Üst'] = 'Fevzi';
+            initialData['A'][1]['Alt'] = 'Fevzi';
 
             fetch(`${FIREBASE_DB_URL}/warehouse.json`, {
                 method: 'PUT',
