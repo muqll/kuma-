@@ -135,7 +135,7 @@
         }
 
         .map-horizontal-layout {
-            min-width: 950px;
+            min-width: 1050px;
             padding: 15px;
             background-color: rgba(11, 25, 44, 0.4);
             display: flex;
@@ -179,7 +179,7 @@
 
         .shelves-container {
             display: grid;
-            grid-template-columns: repeat(8, 1fr);
+            grid-template-columns: repeat(9, 1fr); /* تم التحديث إلى 9 أعمدة للرفوف */
             gap: 8px;
             flex-grow: 1;
         }
@@ -286,7 +286,7 @@
         <div class="panel">
             <h2>🗺️ Canlı Depo Haritası (Kroki Görünümü)</h2>
             <div class="info-bar">
-                💡 Sıralar (A-H) yukarıdan aşağıya, raflar (1-8) soldan sağa yerleştirilmiştir. Sol taraf Güney (Giriş Kapısı), sağ taraf Kuzey yönüdür.
+                💡 Sıralar (A-L) yukarıdan aşağıya, raflar (1-9) soldan sağa yerleştirilmiştir. Sol taraf Güney (Giriش Kapısı), sağ taraf Kuzey yönüdür. (Raf 1 yeni eklenen ön raftır).
             </div>
 
             <div class="map-scroll-container">
@@ -336,13 +336,14 @@
 
     <script>
         const FIREBASE_DB_URL = "https://kumas-c7cb4-default-rtdb.firebaseio.com";
-        const turkishRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
-        const totalShelves = 8;
+        // تحديث عدد الصفوف إلى 12 صفاً (من A إلى L)
+        const turkishRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+        const totalShelves = 9; // تحديث إجمالي الرفوف إلى 9 في الواجهة
+        const databaseShelvesOld = 8; // عدد الرفوف الأصلي في قاعدة البيانات قبل الإزاحة
         const levels = ['Üst', 'Orta', 'Alt'];
 
         let warehouseData = {};
 
-        // جلب البيانات بشكل مستقر وسليم عبر REST API
         function fetchWarehouseData() {
             fetch(`${FIREBASE_DB_URL}/warehouse.json`)
             .then(res => res.json())
@@ -361,11 +362,10 @@
         function fillMissingStructure() {
             turkishRows.forEach(row => {
                 if (!warehouseData[row]) warehouseData[row] = {};
-                for (let s = 1; s <= totalShelves; s++) {
+                for (let s = 1; s <= databaseShelvesOld; s++) {
                     if (!warehouseData[row][s]) {
                         warehouseData[row][s] = { 'Üst': '---', 'Orta': '---', 'Alt': '---' };
                     } else {
-                        // التأكد من ملء المستويات الناقصة داخل الرف نفسه
                         levels.forEach(lvl => {
                             if (!warehouseData[row][s][lvl]) {
                                 warehouseData[row][s][lvl] = '---';
@@ -425,14 +425,25 @@
                     const levelsDiv = document.createElement('div');
                     levelsDiv.className = 'levels';
 
+                    // حساب الرف المقابل في قاعدة البيانات مع تطبيق الإزاحة الذكية
+                    // الرف 1 في الواجهة هو رف جديد فارغ تماماً، الرف 2 يعرض بيانات الرف 1 من قاعدة البيانات... إلخ
+                    let dbShelfIndex = s - 1; 
+
                     levels.forEach(lvl => {
                         const lvlSlot = document.createElement('div');
                         lvlSlot.className = 'level-slot';
                         lvlSlot.id = `slot-${row}-${s}-${lvl}`;
                         
                         let name = '---';
-                        if (warehouseData[row] && warehouseData[row][s] && warehouseData[row][s][lvl]) {
-                            name = warehouseData[row][s][lvl];
+                        if (dbShelfIndex > 0) {
+                            if (warehouseData[row] && warehouseData[row][dbShelfIndex] && warehouseData[row][dbShelfIndex][lvl]) {
+                                name = warehouseData[row][dbShelfIndex][lvl];
+                            }
+                        } else {
+                            // إذا كان الرف رقم 1 (الجديد في الأمام)، نتحقق أولاً إن تم حفظ قيم مخصصة له مباشرة بمسار التعديل الجديد
+                            if (warehouseData[row] && warehouseData[row]["1_new"] && warehouseData[row]["1_new"][lvl]) {
+                                name = warehouseData[row]["1_new"][lvl];
+                            }
                         }
                         lvlSlot.textContent = name;
                         levelsDiv.appendChild(lvlSlot);
@@ -469,18 +480,27 @@
 
             turkishRows.forEach(row => {
                 for (let s = 1; s <= totalShelves; s++) {
+                    let dbShelfIndex = s - 1;
                     levels.forEach(lvl => {
-                        if (warehouseData[row] && warehouseData[row][s]) {
-                            const name = warehouseData[row][s][lvl];
-                            if (name && name !== '---' && name.toLowerCase().includes(query.toLowerCase())) {
-                                matches.push({ row, shelf: s, level: lvl, name });
-                                
-                                const blockEl = document.getElementById(`shelf-${row}-${s}`);
-                                const slotEl = document.getElementById(`slot-${row}-${s}-${lvl}`);
-                                
-                                if(blockEl) blockEl.classList.add('highlight-shelf');
-                                if(slotEl) slotEl.classList.add('highlight-slot');
+                        let name = '---';
+                        if (dbShelfIndex > 0) {
+                            if (warehouseData[row] && warehouseData[row][dbShelfIndex]) {
+                                name = warehouseData[row][dbShelfIndex][lvl];
                             }
+                        } else {
+                            if (warehouseData[row] && warehouseData[row]["1_new"]) {
+                                name = warehouseData[row]["1_new"][lvl];
+                            }
+                        }
+
+                        if (name && name !== '---' && name.toLowerCase().includes(query.toLowerCase())) {
+                            matches.push({ row, shelf: s, level: lvl, name });
+                            
+                            const blockEl = document.getElementById(`shelf-${row}-${s}`);
+                            const slotEl = document.getElementById(`slot-${row}-${s}-${lvl}`);
+                            
+                            if(blockEl) blockEl.classList.add('highlight-shelf');
+                            if(slotEl) slotEl.classList.add('highlight-slot');
                         }
                     });
                 }
@@ -509,12 +529,14 @@
 
         function updateShelfData() {
             const row = document.getElementById('editRow').value;
-            const shelf = document.getElementById('editShelf').value;
+            const shelf = parseInt(document.getElementById('editShelf').value);
             const lvl = document.getElementById('editLevel').value;
             const name = document.getElementById('newName').value.trim() || '---';
 
-            // توحيد المسار بالكامل تحت حاوية 'warehouse' ليتوافق مع دالة القراءة
-            fetch(`${FIREBASE_DB_URL}/warehouse/${row}/${shelf}.json`, {
+            // تحديد المسار الصحيح للحفظ في Firebase حسب الإزاحة لمنع تداخل البيانات القديمة
+            let targetDbShelf = shelf === 1 ? "1_new" : (shelf - 1);
+
+            fetch(`${FIREBASE_DB_URL}/warehouse/${row}/${targetDbShelf}.json`, {
                 method: 'PATCH',
                 body: JSON.stringify({ [lvl]: name })
             })
@@ -522,9 +544,9 @@
             .then(() => {
                 document.getElementById('newName').value = '';
                 if(!warehouseData[row]) warehouseData[row] = {};
-                if(!warehouseData[row][shelf]) warehouseData[row][shelf] = {};
+                if(!warehouseData[row][targetDbShelf]) warehouseData[row][targetDbShelf] = {};
                 
-                warehouseData[row][shelf][lvl] = name;
+                warehouseData[row][targetDbShelf][lvl] = name;
                 renderInterface();
                 searchLocation();
             })
