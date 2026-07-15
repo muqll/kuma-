@@ -286,7 +286,7 @@
         <div class="panel">
             <h2>🗺️ Canlı Depo Haritası (Kroki Görünümü)</h2>
             <div class="info-bar">
-                💡 Sıralar (A-L) yukarıdan aşağıya, raflar (1-9) soldan sağa yerleştirilmiştir. Sol taraf Güney (Giriş Kapısı), sağ taraf Kuzey yönüdür. (Raf 1 yeni eklenen ön raftır).
+                💡 Sıralar (A-O) yukarıdan aşağıya, raflar (1-9) soldan sağa yerleştirilmiştir. Sol taraf Güney (Giriş Kapısı), sağ taraf Kuzey yönüdür. (Raf 1 yeni eklenen ön raftır).
             </div>
 
             <div class="map-scroll-container">
@@ -336,8 +336,8 @@
 
     <script>
         const FIREBASE_DB_URL = "https://kumas-c7cb4-default-rtdb.firebaseio.com";
-        // تحديث عدد الصفوف إلى 12 صفاً (من A إلى L)
-        const turkishRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L'];
+        // تم تحديث الصفوف لتشمل 15 صفاً (من A إلى O) بدلاً من 12 دون التأثير على البيانات القديمة
+        const turkishRows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O'];
         const totalShelves = 9; // تحديث إجمالي الرفوف إلى 9 في الواجهة
         const databaseShelvesOld = 8; // عدد الرفوف الأصلي في قاعدة البيانات قبل الإزاحة
         const levels = ['Üst', 'Orta', 'Alt'];
